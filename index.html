@@ -1,211 +1,187 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <meta charset="utf-8">
+    <title>LearnXR VR Workshop</title>
+    <script src="https://aframe.io/releases/1.7.1/aframe.min.js"></script>
+  </head>
+  <body>
+    <a-scene>
 
-<head>
-  <meta charset="utf-8">
-  <title>LearnXR VR — Circular Motion Workshop</title>
-  <script src="https://aframe.io/releases/1.7.1/aframe.min.js"></script>
-  <script>
-    // --- Concept Pages ---
-    const conceptPages = {
-      ball: [
-        "Motion is the change in position of an object with time.",
-        "Circular motion is when an object moves along a circular path.",
-        "Examples: Ferris wheel, wheels, planets orbiting the Sun.",
-        "In circular motion, speed may be constant but direction changes.",
-        "Velocity changes because direction changes; this causes acceleration towards center."
-      ],
-      pendulum: [
-        "Periodic motion repeats at regular intervals.",
-        "A pendulum is a weight hung from a fixed point that swings back and forth.",
-        "The pendulum moves from one side to another and back in equal time intervals.",
-        "Time period = time for one complete swing; frequency = number of swings per second.",
-        "Examples: clocks, playground swings, and scientific experiments."
-      ],
-      ring: [
-        "Objects moving in a circle need a force directed towards the center.",
-        "This inward force is called centripetal force.",
-        "Centripetal acceleration depends on speed and radius: a = v^2/r.",
-        "Examples: spinning rides, satellites, turning cars.",
-        "Key idea: motion in a circle requires constant change of direction due to inward force."
-      ],
-      quiz: [
-        "1. What is circular motion?",
-        "2. Give an example of periodic motion.",
-        "3. Why does velocity change in circular motion?",
-        "4. Name a real-life example of centripetal force.",
-        "5. What is a pendulum?",
-        "6. Define time period in pendulum motion.",
-        "7. Explain frequency of a pendulum.",
-        "8. Give two examples of circular motion in daily life.",
-        "9. How is centripetal acceleration calculated?",
-        "10. Why is centripetal force necessary?",
-        "11. Explain motion when no centripetal force acts.",
-        "12. Name applications of centripetal force."
-      ]
-    };
+      <!-- Assets -->
+      <a-assets>
+        <img id="city-sky" src="https://cdn.aframe.io/360-image-gallery-boilerplate/img/city.jpg">
+      </a-assets>
 
-    // --- Learning Status ---
-    const learningStatus = { ball: 0, pendulum: 0, ring: 0, quiz: 0 };
+      <!-- Camera Rig with Controllers -->
+      <a-entity id="rig">
+        <a-entity camera position="0 1.6 0" look-controls wasd-controls>
+          <a-cursor color="#FFFFFF" fuse="false" raycaster="objects: .clickable; far: 20"></a-cursor>
+        </a-entity>
 
-    // --- Click-to-learn Component ---
-    AFRAME.registerComponent('click-learn', {
-      schema: { concept: { type: 'string' } },
-      init: function () {
-        this.el.addEventListener('click', () => showConcept(this.data.concept));
-      }
-    });
+        <!-- Left Controller -->
+        <a-entity laser-controls="hand: left"
+                  raycaster="objects: .clickable; far: 20"
+                  line="color: cyan"
+                  raycast-click>
+        </a-entity>
 
-    let currentConcept = '';
-    function showConcept(concept) {
-      currentConcept = concept;
-      const panel = document.querySelector('#contentPanel');
-      panel.setAttribute('visible', true);
-      panel.setAttribute('data-concept', concept);
+        <!-- Right Controller -->
+        <a-entity laser-controls="hand: right"
+                  raycaster="objects: .clickable; far: 20"
+                  line="color: magenta"
+                  raycast-click>
+        </a-entity>
+      </a-entity>
 
-      // Show first page or last visited page
-      learningStatus[concept] = Math.max(learningStatus[concept], 1);
-      updateConceptText();
-    }
+      <!-- Lights -->
+      <a-light type="ambient" color="#BBB" intensity="0.5"></a-light>
+      <a-light type="directional" color="#FFF" intensity="0.8" position="-1 2 1"></a-light>
 
-    function updateConceptText() {
-      const panel = document.querySelector('#contentPanel');
-      const concept = panel.getAttribute('data-concept');
-      const page = learningStatus[concept];
-      panel.querySelector('a-text').setAttribute('value', conceptPages[concept][page - 1]);
-    }
+      <!-- Sky -->
+      <a-sky src="#city-sky"></a-sky>
 
-    function nextPage() {
-      const panel = document.querySelector('#contentPanel');
-      const concept = panel.getAttribute('data-concept');
-      if (learningStatus[concept] < conceptPages[concept].length) {
-        learningStatus[concept]++;
-        updateConceptText();
-      }
-    }
+      <!-- Concept Spheres -->
+      <a-sphere class="clickable" id="concept1" position="-3 1.25 -5" radius="1.25" color="#EF2D5E"></a-sphere>
+      <a-sphere class="clickable" id="concept2" position="-1 1.25 -5" radius="1.25" color="#4CC3D9"></a-sphere>
+      <a-sphere class="clickable" id="concept3" position="1 1.25 -5" radius="1.25" color="#FFC65D"></a-sphere>
 
-    function prevPage() {
-      const panel = document.querySelector('#contentPanel');
-      const concept = panel.getAttribute('data-concept');
-      if (learningStatus[concept] > 1) {
-        learningStatus[concept]--;
-        updateConceptText();
-      }
-    }
+      <!-- Quiz Sphere -->
+      <a-sphere class="clickable" id="quiz" position="3 1.25 -5" radius="1.25" color="#8A2BE2"></a-sphere>
+      <a-text value="Quiz" position="3 3 -5" align="center" color="white" width="3"></a-text>
 
-    function closePanel() {
-      document.querySelector('#contentPanel').setAttribute('visible', false);
-    }
+      <!-- Panels -->
+      <a-entity id="panel" visible="false">
+        <a-plane id="panelBG" color="#222" width="4" height="3" position="0 1.6 -2"></a-plane>
+        <a-text id="panelTitle" value="" color="#FFF" position="-1.8 2 -2" width="3"></a-text>
+        <a-text id="panelContent" value="" color="#FFF" position="-1.8 1.6 -2" width="3" wrap-count="40"></a-text>
+        <a-box id="nextBtn" class="clickable" color="#4CAF50" depth="0.2" height="0.3" width="0.7" position="1 0.7 -2">
+          <a-text value="Next" position="-0.25 0.05 0.15" width="1.5" color="white"></a-text>
+        </a-box>
+        <a-box id="prevBtn" class="clickable" color="#F44336" depth="0.2" height="0.3" width="0.7" position="-1 0.7 -2">
+          <a-text value="Prev" position="-0.25 0.05 0.15" width="1.5" color="white"></a-text>
+        </a-box>
+      </a-entity>
 
-    // --- Floating Animation Component ---
-    AFRAME.registerComponent('floaty', {
-      schema: { amplitude: { default: 0.2 }, speed: { default: 1 } },
-      init: function () {
-        this.startY = this.el.object3D.position.y;
-        this.time = 0;
-      },
-      tick: function (t, dt) {
-        this.time += dt / 1000;
-        this.el.object3D.position.y = this.startY + Math.sin(this.time * this.data.speed) * this.data.amplitude;
-      }
-    });
+      <!-- Score Text -->
+      <a-text id="scoreText" value="" position="0 4 -2" color="yellow" align="center" width="6"></a-text>
 
-    // --- Controller click helper for Meta Quest 3s ---
-    AFRAME.registerComponent('controller-listener', {
-      init: function () {
-        const el = this.el;
-        el.addEventListener('triggerdown', () => {
-          // Use raycaster intersection to detect clicked objects
-          const intersections = el.components.raycaster.intersections;
-          if (intersections.length > 0) {
-            const clickedEl = intersections[0].object.el;
-            clickedEl.emit('click');
+      <!-- Scripts -->
+      <script>
+        // Raycast trigger support for controllers
+        AFRAME.registerComponent('raycast-click', {
+          init: function () {
+            this.el.addEventListener('triggerdown', () => {
+              const raycaster = this.el.components.raycaster;
+              if (!raycaster) return;
+              const intersections = raycaster.intersections;
+              if (intersections.length > 0) {
+                const target = intersections[0].object.el;
+                if (target) target.emit('click');
+              }
+            });
           }
         });
-      }
-    });
-  </script>
-</head>
 
-<body>
-  <a-scene>
-    <!-- Assets -->
-    <a-assets>
-      <img id="wood" src="https://cdn.aframe.io/a-painter/images/wood.jpg">
-      <img id="floor" src="https://cdn.aframe.io/a-painter/images/floor.jpg">
-      <img id="city-sky" src="https://cdn.aframe.io/360-image-gallery-boilerplate/img/city.jpg">
-      <img id="landscape" src="https://raw.githubusercontent.com/alluringxstalwart/SourceYISL/main/Landscape.png">
-    </a-assets>
+        // Concept pages
+        const concepts = {
+          concept1: [
+            "Concept 1: Motion Basics - Page 1",
+            "Concept 1: Motion Basics - Page 2",
+            "Concept 1: Motion Basics - Page 3"
+          ],
+          concept2: [
+            "Concept 2: Speed & Velocity - Page 1",
+            "Concept 2: Speed & Velocity - Page 2",
+            "Concept 2: Speed & Velocity - Page 3"
+          ],
+          concept3: [
+            "Concept 3: Centripetal Force - Page 1",
+            "Concept 3: Centripetal Force - Page 2",
+            "Concept 3: Centripetal Force - Page 3",
+            "Concept 3: Centripetal Force - Page 4"
+          ]
+        };
 
-    <!-- Camera + Controls -->
-    <a-entity id="rig">
-      <a-entity camera position="0 1.6 0" look-controls wasd-controls>
-        <a-cursor color="#FFFFFF" fuse="false" raycaster="objects: .clickable; far: 20"></a-cursor>
-      </a-entity>
+        const quizQuestions = [
+          "Quiz Q1: Explain Concept 1 in your own words.",
+          "Quiz Q2: Explain Concept 1 in your own words.",
+          "Quiz Q3: Explain Concept 2 in your own words.",
+          "Quiz Q4: Explain Concept 2 in your own words.",
+          "Quiz Q5: Explain Concept 2 in your own words.",
+          "Quiz Q6: Explain Concept 3 in your own words.",
+          "Quiz Q7: Explain Concept 3 in your own words.",
+          "Quiz Q8: Explain Concept 3 in your own words.",
+          "Quiz Q9: Explain Concept 1 in your own words.",
+          "Quiz Q10: Explain Concept 2 in your own words.",
+          "Quiz Q11: Explain Concept 3 in your own words.",
+          "Quiz Q12: Explain all concepts in your own words."
+        ];
 
-      <!-- Left Controller -->
-      <a-entity id="leftController" meta-touch-controls="hand: left" laser-controls="hand: left"
-                raycaster="objects: .clickable; far: 20" line="color: cyan" controller-listener>
-      </a-entity>
+        let currentConcept = "";
+        let pageIndex = 0;
+        let quizIndex = 0;
 
-      <!-- Right Controller -->
-      <a-entity id="rightController" meta-touch-controls="hand: right" laser-controls="hand: right"
-                raycaster="objects: .clickable; far: 20" line="color: magenta" controller-listener>
-      </a-entity>
-    </a-entity>
+        const panel = document.querySelector('#panel');
+        const panelTitle = document.querySelector('#panelTitle');
+        const panelContent = document.querySelector('#panelContent');
+        const scoreText = document.querySelector('#scoreText');
 
-    <!-- Lights -->
-    <a-light type="ambient" color="#BBB" intensity="0.5"></a-light>
-    <a-light type="directional" color="#FFF" intensity="0.8" position="-1 2 1"></a-light>
+        const showPanel = (title, content) => {
+          panelTitle.setAttribute('value', title);
+          panelContent.setAttribute('value', content);
+          panel.setAttribute('visible', true);
+        };
 
-    <!-- Environment -->
-    <a-plane position="0 0 0" rotation="-90 0 0" width="20" height="20" src="#floor"></a-plane>
-    <a-sky src="#city-sky"></a-sky>
+        const hidePanel = () => panel.setAttribute('visible', false);
 
-    <!-- Floating Spheres for Concepts + Quiz -->
-    <a-sphere class="clickable" position="-4 1.5 -4" radius="0.5" color="#4CC3D9"
-              click-learn="concept: ball" floaty>
-      <a-text value="Ball" align="center" color="white" width="1.5" position="0 0.8 0"></a-text>
-    </a-sphere>
+        // Concept click
+        document.querySelectorAll('.clickable').forEach(el => {
+          el.addEventListener('click', () => {
+            if (el.id.startsWith("concept")) {
+              currentConcept = el.id;
+              pageIndex = 0;
+              showPanel(currentConcept, concepts[currentConcept][pageIndex]);
+            } else if (el.id === "quiz") {
+              currentConcept = "quiz";
+              pageIndex = 0;
+              showPanel("Quiz", quizQuestions[quizIndex]);
+            }
+          });
+        });
 
-    <a-sphere class="clickable" position="-1.3 1.5 -4" radius="0.5" color="#EF2D5E"
-              click-learn="concept: pendulum" floaty>
-      <a-text value="Pendulum" align="center" color="white" width="1.5" position="0 0.8 0"></a-text>
-    </a-sphere>
+        // Next & Prev buttons
+        document.querySelector('#nextBtn').addEventListener('click', () => {
+          if (currentConcept === "quiz") {
+            quizIndex++;
+            if (quizIndex >= quizQuestions.length) {
+              quizIndex = quizQuestions.length - 1;
+              scoreText.setAttribute('value', "You finished the quiz!");
+            }
+            panelContent.setAttribute('value', quizQuestions[quizIndex]);
+          } else {
+            if (pageIndex < concepts[currentConcept].length - 1) {
+              pageIndex++;
+              panelContent.setAttribute('value', concepts[currentConcept][pageIndex]);
+            }
+          }
+        });
 
-    <a-sphere class="clickable" position="1.3 1.5 -4" radius="0.5" color="#00FFAA"
-              click-learn="concept: ring" floaty>
-      <a-text value="Centripetal" align="center" color="white" width="1.5" position="0 0.8 0"></a-text>
-    </a-sphere>
+        document.querySelector('#prevBtn').addEventListener('click', () => {
+          if (currentConcept === "quiz") {
+            if (quizIndex > 0) {
+              quizIndex--;
+              panelContent.setAttribute('value', quizQuestions[quizIndex]);
+            }
+          } else {
+            if (pageIndex > 0) {
+              pageIndex--;
+              panelContent.setAttribute('value', concepts[currentConcept][pageIndex]);
+            }
+          }
+        });
+      </script>
 
-    <a-sphere class="clickable" position="4 1.5 -4" radius="0.5" color="#FFD700"
-              click-learn="concept: quiz" floaty>
-      <a-text value="Quiz" align="center" color="black" width="1.5" position="0 0.8 0"></a-text>
-    </a-sphere>
-
-    <!-- 3D Background Image -->
-    <a-image src="#landscape" position="0 5 -10" width="25" height="7.5"></a-image>
-    <a-text value="Young Innovators STEM Lab" position="0 9.5 -10" align="center" color="white" font="mozillavr"
-      width="10" height="5"></a-text>
-
-    <!-- Content Panel -->
-    <a-plane id="contentPanel" position="0 1.6 -3" width="6" height="3" color="#222" visible="false">
-      <a-text value="" align="center" color="white" width="5" position="0 0.7 0"></a-text>
-      <a-box position="-1 -0.9 0.01" width="1" height="0.4" depth="0.05" color="yellow" class="clickable"
-             onclick="prevPage()">
-        <a-text value="Prev" align="center" color="black" width="0.8" position="0 0 0.03"></a-text>
-      </a-box>
-      <a-box position="1 -0.9 0.01" width="1" height="0.4" depth="0.05" color="yellow" class="clickable"
-             onclick="nextPage()">
-        <a-text value="Next" align="center" color="black" width="0.8" position="0 0 0.03"></a-text>
-      </a-box>
-      <a-box position="0 -0.9 0.01" width="1" height="0.4" depth="0.05" color="red" class="clickable"
-             onclick="closePanel()">
-        <a-text value="Close" align="center" color="white" width="0.8" position="0 0 0.03"></a-text>
-      </a-box>
-    </a-plane>
-
-  </a-scene>
-</body>
-
+    </a-scene>
+  </body>
 </html>
