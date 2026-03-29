@@ -1,0 +1,60 @@
+<a-scene background="color: #1a1a2e" id="pumpScene" embedded vr-mode-ui="enabled: true" webxr="requiredFeatures: viewer">
+    <a-camera position="0 1.6 -3" look-controls wasd-controls="acceleration: 100"></a-camera>
+
+    <!-- VR Hand Controllers with laser pointers -->
+    <a-entity id="leftHand" laser-controls="hand: left" raycaster="objects: .interactable" line="color: #FF0000"></a-entity>
+    <a-entity id="rightHand" laser-controls="hand: right" raycaster="objects: .interactable" line="color: #00FF00"></a-entity>
+
+    <a-light type="ambient" intensity="0.8"></a-light>
+    <a-light type="directional" intensity="1" position="5 10 5"></a-light>
+    <a-light type="point" intensity="0.6" position="-5 5 5"></a-light>
+
+    <!-- Floor -->
+    <a-plane position="0 0 0" rotation="-90 0 0" width="80" height="80" color="#2d3561" roughness="0.8"></a-plane>
+
+    <!-- Main Heart Display (Large, Centered) -->
+    <a-entity id="heartPump" class="interactable" position="0 1.8 -5">
+        <!-- LEFT ATRIUM -->
+        <a-sphere id="la-pump" radius="0.5" position="-0.8 0.7 0" color="#ff4444"
+                  animation="property: scale; to: 1.18 1.18 1.18; dur: 450; startEvents: continuePump"
+                  animation__reverse="property: scale; to: 1 1 1; dur: 450; startEvents: continuePump">
+        </a-sphere>
+        <!-- RIGHT ATRIUM -->
+        <a-sphere id="ra-pump" radius="0.48" position="0.8 0.7 0" color="#ff5555"
+                  animation="property: scale; to: 1.18 1.18 1.18; dur: 450; startEvents: continuePump"
+                  animation__reverse="property: scale; to: 1 1 1; dur: 450; startEvents: continuePump">
+        </a-sphere>
+        <!-- LEFT VENTRICLE -->
+        <a-sphere id="lv-pump" radius="0.65" position="-0.6 -0.5 0" color="#d32f2f"
+                  animation="property: scale; to: 1.3 1.3 1.3; dur: 550; startEvents: continuePump"
+                  animation__reverse="property: scale; to: 1 1 1; dur: 550; startEvents: continuePump">
+        </a-sphere>
+        <!-- RIGHT VENTRICLE -->
+        <a-sphere id="rv-pump" radius="0.6" position="0.6 -0.5 0" color="#c62828"
+                  animation="property: scale; to: 1.3 1.3 1.3; dur: 550; startEvents: continuePump"
+                  animation__reverse="property: scale; to: 1 1 1; dur: 550; startEvents: continuePump">
+        </a-sphere>
+        <!-- Apex -->
+        <a-cone radius-bottom="0.4" radius-top="0" height="1.0" position="0 -1.5 0" color="#b71c1c"></a-cone>
+        <!-- Septum -->
+        <a-box width="0.12" height="1.3" depth="0.6" position="0 0 0" color="#8b0000" opacity="0.7"></a-box>
+    </a-entity>
+
+    <!-- Glow effect -->
+    <a-entity position="0 1.8 -5" animation="property: rotation; to: 0 360 0; dur: 6000; loop: true">
+        <a-sphere radius="2.5" position="0 0 0" color="#ff1744" opacity="0.06"></a-sphere>
+    </a-entity>
+
+    <script>
+        // Allow VR controller trigger to pump heart
+        const heart = document.getElementById('heartPump');
+
+        document.querySelectorAll('[laser-controls]').forEach(controller => {
+            controller.addEventListener('triggerdown', () => {
+                if (heart) {
+                    heart.emit('continuePump');
+                }
+            });
+        });
+    </script>
+</a-scene>
