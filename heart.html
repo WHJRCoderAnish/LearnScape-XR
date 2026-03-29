@@ -3,77 +3,508 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Heart XR with VR Controllers</title>
+    <title>LearnScape XR - Heart</title>
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; overflow: hidden;
+background: #000; }
+        a-scene { width: 100%; height: 100vh; }
+
+        .header { position: fixed; top: 0; left: 0; right: 0; display:
+flex; justify-content: space-between; align-items: center; padding:
+20px; z-index: 50; }
+        .header h1 { color: white; font-size: 32px; flex: 1;
+text-align: center; }
+
+        .back-btn {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .back-btn:hover { background: #764ba2; }
+
+        .main-btn {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            background: #ff6b9d;
+            color: white;
+            z-index: 50;
+            transition: all 0.3s ease;
+        }
+
+        .main-btn:hover { background: #e91e63; transform: scale(1.05); }
+
+        .sound-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            background: rgba(100, 200, 255, 0.3);
+            color: white;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            z-index: 50;
+        }
+
+        .sound-toggle:hover { background: rgba(100, 200, 255, 0.5); }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .overlay.show { display: flex; }
+
+        .panel {
+            background: rgba(20, 20, 40, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            color: white;
+            max-width: 700px;
+            text-align: center;
+        }
+
+        .panel h2 { font-size: 32px; margin-bottom: 20px; color: #ff6b9d; }
+        .panel p { font-size: 18px; line-height: 1.8; margin-bottom:
+30px; color: #e0e0e0; }
+
+        .close-btn {
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .close-btn:hover { background: #764ba2; }
+
+        .video-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: none;
+            z-index: 100;
+        }
+
+        .video-overlay.show { display: block; }
+
+        .video-overlay a-scene { display: block !important; }
+
+        .pump-close-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 12px 25px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            z-index: 101;
+            transition: all 0.3s ease;
+        }
+
+        .pump-close-btn:hover { background: #764ba2; }
+
+        .pump-instructions {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 14px;
+            z-index: 101;
+            display: none;
+        }
+
+        .pump-instructions.show { display: block; }
+
+        .video-close-btn:hover { background: #764ba2; }
+    </style>
 </head>
 <body>
-<a-scene background="color: #ffe0e0" vr-mode-ui="enabled: true" embedded>
-    <!-- Camera + VR controls -->
-    <a-entity id="cameraRig" position="0 1.6 5">
-        <a-camera look-controls wasd-controls></a-camera>
-        <!-- Left and right hand controllers -->
-        <a-entity hand-controls="hand: left; handModelStyle: box"></a-entity>
-        <a-entity hand-controls="hand: right; handModelStyle: box"></a-entity>
-    </a-entity>
+    <div class="header">
+        <button class="back-btn"
+onclick="window.location.href='index.html';">← Back to Hub</button>
+        <h1>❤️ HEART WORLD</h1>
+        <div style="width: 100px;"></div>
+    </div>
 
-    <!-- Lighting -->
-    <a-light type="ambient" intensity="0.6"></a-light>
-    <a-light type="directional" intensity="0.8" position="5 10 5"></a-light>
+    <a-scene background="color: #ffb3c1">
+        <a-camera position="0 1.6 0" look-controls wasd-controls></a-camera>
+        <a-light type="ambient" intensity="0.7"></a-light>
+        <a-light type="directional" intensity="0.8" position="10 15
+10"></a-light>
 
-    <!-- Floor -->
-    <a-plane rotation="-90 0 0" width="50" height="50" color="#ffc0cb"></a-plane>
+        <a-plane position="0 0 0" rotation="-90 0 0" width="50"
+height="50" color="#ffc0cb"></a-plane>
 
-    <!-- Heart model -->
-    <a-entity id="heart" position="0 2 -5">
-        <a-sphere id="la" radius="0.45" position="-0.7 0.6 0" color="#ff4444"
-                  animation="property: scale; to: 1.15 1.15 1.15; dur: 400; startEvents: pump"
-                  animation__reverse="property: scale; to: 1 1 1; dur: 400; startEvents: pump">
-        </a-sphere>
+        <!-- Enhanced Anatomical Heart -->
+        <a-entity id="heart" position="0 2 -8">
+            <!-- LEFT ATRIUM (upper left) -->
+            <a-sphere id="la" radius="0.45" position="-0.7 0.6 0"
+color="#ff4444"
+                      animation="property: scale; to: 1.15 1.15 1.15;
+dur: 400; startEvents: pump"
+                      animation__reverse="property: scale; to: 1 1 1;
+dur: 400; startEvents: pump">
+            </a-sphere>
 
-        <a-sphere id="ra" radius="0.42" position="0.7 0.6 0" color="#ff5555"
-                  animation="property: scale; to: 1.15 1.15 1.15; dur: 400; startEvents: pump"
-                  animation__reverse="property: scale; to: 1 1 1; dur: 400; startEvents: pump">
-        </a-sphere>
+            <!-- RIGHT ATRIUM (upper right) -->
+            <a-sphere id="ra" radius="0.42" position="0.7 0.6 0" color="#ff5555"
+                      animation="property: scale; to: 1.15 1.15 1.15;
+dur: 400; startEvents: pump"
+                      animation__reverse="property: scale; to: 1 1 1;
+dur: 400; startEvents: pump">
+            </a-sphere>
 
-        <a-sphere id="lv" radius="0.6" position="-0.5 -0.4 0" color="#d32f2f"
-                  animation="property: scale; to: 1.25 1.25 1.25; dur: 500; startEvents: pump"
-                  animation__reverse="property: scale; to: 1 1 1; dur: 500; startEvents: pump">
-        </a-sphere>
+            <!-- LEFT VENTRICLE (lower left) - Main pumping chamber -->
+            <a-sphere id="lv" radius="0.6" position="-0.5 -0.4 0"
+color="#d32f2f"
+                      animation="property: scale; to: 1.25 1.25 1.25;
+dur: 500; startEvents: pump"
+                      animation__reverse="property: scale; to: 1 1 1;
+dur: 500; startEvents: pump">
+            </a-sphere>
 
-        <a-sphere id="rv" radius="0.55" position="0.5 -0.4 0" color="#c62828"
-                  animation="property: scale; to: 1.25 1.25 1.25; dur: 500; startEvents: pump"
-                  animation__reverse="property: scale; to: 1 1 1; dur: 500; startEvents: pump">
-        </a-sphere>
+            <!-- RIGHT VENTRICLE (lower right) -->
+            <a-sphere id="rv" radius="0.55" position="0.5 -0.4 0"
+color="#c62828"
+                      animation="property: scale; to: 1.25 1.25 1.25;
+dur: 500; startEvents: pump"
+                      animation__reverse="property: scale; to: 1 1 1;
+dur: 500; startEvents: pump">
+            </a-sphere>
 
-        <a-cone radius-bottom="0.35" radius-top="0" height="0.9" position="0 -1.3 0" color="#b71c1c"></a-cone>
-        <a-box width="0.1" height="1.2" depth="0.5" position="0 0 0" color="#8b0000" opacity="0.6"></a-box>
-        <a-cylinder radius="0.12" height="0.8" position="1.2 -0.2 0" rotation="0 0 75" color="#0066cc" opacity="0.7"></a-cylinder>
-        <a-cylinder radius="0.1" height="0.5" position="1.1 0.8 0" rotation="0 0 65" color="#0066cc" opacity="0.7"></a-cylinder>
-        <a-cylinder radius="0.15" height="0.8" position="-1.2 0.5 0" rotation="0 0 -65" color="#ff0000" opacity="0.8"></a-cylinder>
-        <a-cylinder radius="0.12" height="0.6" position="1.1 0.3 0.3" rotation="0 0 60" color="#ff6666" opacity="0.8"></a-cylinder>
-    </a-entity>
+            <!-- Heart Apex (point at bottom) -->
+            <a-cone radius-bottom="0.35" radius-top="0" height="0.9"
+position="0 -1.3 0" color="#b71c1c"></a-cone>
 
-    <!-- Rotating glow around the heart -->
-    <a-entity position="0 2 -5" animation="property: rotation; to: 0 360 0; dur: 5000; loop: true">
-        <a-sphere radius="2.0" color="#ff1744" opacity="0.05"></a-sphere>
-    </a-entity>
-</a-scene>
+            <!-- Septum (wall between left and right) -->
+            <a-box width="0.1" height="1.2" depth="0.5" position="0 0
+0" color="#8b0000" opacity="0.6"></a-box>
 
-<script>
-    // Heartbeat on click or controller trigger
-    const heart = document.getElementById('heart');
+            <!-- Inferior Vena Cava (blood vessel from body to heart) -->
+            <a-cylinder radius="0.12" height="0.8" position="1.2 -0.2
+0" rotation="0 0 75" color="#0066cc" opacity="0.7"></a-cylinder>
 
-    // Play scale animation
-    function pumpHeart() {
-        heart.emit('pump');
-    }
+            <!-- Superior Vena Cava (blood vessel from upper body) -->
+            <a-cylinder radius="0.1" height="0.5" position="1.1 0.8 0"
+rotation="0 0 65" color="#0066cc" opacity="0.7"></a-cylinder>
 
-    // Listen for click (desktop) or VR controller triggers
-    document.querySelector('a-scene').addEventListener('click', pumpHeart);
+            <!-- Aorta (blood vessel leaving heart) -->
+            <a-cylinder radius="0.15" height="0.8" position="-1.2 0.5
+0" rotation="0 0 -65" color="#ff0000" opacity="0.8"></a-cylinder>
 
-    document.querySelectorAll('[hand-controls]').forEach(controller => {
-        controller.addEventListener('triggerdown', pumpHeart);
-    });
-</script>
+            <!-- Pulmonary Artery -->
+            <a-cylinder radius="0.12" height="0.6" position="1.1 0.3
+0.3" rotation="0 0 60" color="#ff6666" opacity="0.8"></a-cylinder>
+        </a-entity>
+
+        <!-- Rotating glow effect -->
+        <a-entity position="0 2 -8" animation="property: rotation; to:
+0 360 0; dur: 5000; loop: true">
+            <a-sphere radius="2.0" position="0 0 0" color="#ff1744"
+opacity="0.05"></a-sphere>
+        </a-entity>
+
+        <a-entity position="0 -1 -4">
+            <a-text value="Click the button below" align="center"
+scale="1.5 1.5 1.5" color="white"></a-text>
+        </a-entity>
+    </a-scene>
+
+    <button class="main-btn" onclick="showInfo()">❤️ Learn About Your
+Heart</button>
+    <button class="sound-toggle" id="soundToggle"
+onclick="toggleSound()">🔊 Sound ON</button>
+
+    <div class="overlay" id="overlay">
+        <div class="panel">
+            <h2>❤️ The Heart System</h2>
+            <p>Your heart is an amazing organ! It pumps blood
+throughout your entire body about 100,000 times per day. With every
+heartbeat, oxygen-rich blood flows to your organs and tissues,
+delivering life-giving oxygen and nutrients. When your heart contracts
+(beats), it forces blood out to your body. When it relaxes, blood
+returns to fill it again. This continuous pumping action is what keeps
+you alive!</p>
+            <button class="close-btn" onclick="showVideo();">❤️ Watch
+It Pump</button>
+            <button class="close-btn" onclick="closeInfo();"
+style="margin-left: 10px;">Close</button>
+        </div>
+    </div>
+    <div class="video-overlay" id="videoOverlay">
+        <button class="pump-close-btn" onclick="closeVideo();">← Back</button>
+        <div class="pump-instructions show" id="pumpInstructions">🖱️
+Drag/Look | ⌨️ WASD to Move | 👓 VR Supported</div>
+
+        <a-scene background="color: #1a1a2e" id="pumpScene" embedded
+vr-mode-ui="enabled: true" webxr="requiredFeatures: viewer">
+            <a-camera position="0 1.6 -3" look-controls
+wasd-controls="acceleration: 100"></a-camera>
+
+            <!-- VR Hand Controllers -->
+            <a-entity id="leftHand" hand-controls="hand: left;
+handModelStyle: box"></a-entity>
+            <a-entity id="rightHand" hand-controls="hand: right;
+handModelStyle: box"></a-entity>
+
+            <a-light type="ambient" intensity="0.8"></a-light>
+            <a-light type="directional" intensity="1" position="5 10
+5"></a-light>
+            <a-light type="point" intensity="0.6" position="-5 5 5"></a-light>
+
+            <!-- Floor -->
+            <a-plane position="0 0 0" rotation="-90 0 0" width="80"
+height="80" color="#2d3561" roughness="0.8"></a-plane>
+
+            <!-- Main Heart Display (Large, Centered) -->
+            <a-entity id="heartPump" position="0 1.8 -5">
+                <!-- LEFT ATRIUM -->
+                <a-sphere id="la-pump" radius="0.5" position="-0.8 0.7
+0" color="#ff4444"
+                          animation="property: scale; to: 1.18 1.18
+1.18; dur: 450; startEvents: continuePump"
+                          animation__reverse="property: scale; to: 1 1
+1; dur: 450; startEvents: continuePump">
+                </a-sphere>
+
+                <!-- RIGHT ATRIUM -->
+                <a-sphere id="ra-pump" radius="0.48" position="0.8 0.7
+0" color="#ff5555"
+                          animation="property: scale; to: 1.18 1.18
+1.18; dur: 450; startEvents: continuePump"
+                          animation__reverse="property: scale; to: 1 1
+1; dur: 450; startEvents: continuePump">
+                </a-sphere>
+
+                <!-- LEFT VENTRICLE -->
+                <a-sphere id="lv-pump" radius="0.65" position="-0.6
+-0.5 0" color="#d32f2f"
+                          animation="property: scale; to: 1.3 1.3 1.3;
+dur: 550; startEvents: continuePump"
+                          animation__reverse="property: scale; to: 1 1
+1; dur: 550; startEvents: continuePump">
+                </a-sphere>
+
+                <!-- RIGHT VENTRICLE -->
+                <a-sphere id="rv-pump" radius="0.6" position="0.6 -0.5
+0" color="#c62828"
+                          animation="property: scale; to: 1.3 1.3 1.3;
+dur: 550; startEvents: continuePump"
+                          animation__reverse="property: scale; to: 1 1
+1; dur: 550; startEvents: continuePump">
+                </a-sphere>
+
+                <!-- Apex -->
+                <a-cone radius-bottom="0.4" radius-top="0"
+height="1.0" position="0 -1.5 0" color="#b71c1c"></a-cone>
+
+                <!-- Septum -->
+                <a-box width="0.12" height="1.3" depth="0.6"
+position="0 0 0" color="#8b0000" opacity="0.7"></a-box>
+
+                <!-- Inferior Vena Cava (from body) -->
+                <a-cylinder radius="0.15" height="3" position="1.5 0
+0" rotation="0 0 70" color="#0066cc" opacity="0.8"></a-cylinder>
+
+                <!-- Superior Vena Cava (from upper body) -->
+                <a-cylinder radius="0.12" height="2.5" position="1.3 1
+0" rotation="0 0 60" color="#0066cc" opacity="0.8"></a-cylinder>
+
+                <!-- Aorta (to body) - Main artery -->
+                <a-cylinder radius="0.18" height="3.5" position="-1.5
+0.8 0" rotation="0 0 -60" color="#ff0000" opacity="0.85"></a-cylinder>
+
+                <!-- Pulmonary Artery (to lungs) -->
+                <a-cylinder radius="0.15" height="2.5" position="1.4
+0.5 0.5" rotation="0 0 65" color="#ff6666" opacity="0.8"></a-cylinder>
+
+                <!-- Pulmonary Vein (from lungs) -->
+                <a-cylinder radius="0.13" height="2" position="-1.2
+0.3 0.5" rotation="0 0 -70" color="#0088dd"
+opacity="0.8"></a-cylinder>
+            </a-entity>
+
+            <!-- Glow effect -->
+            <a-entity position="0 1.8 -5" animation="property:
+rotation; to: 0 360 0; dur: 6000; loop: true">
+                <a-sphere radius="2.5" position="0 0 0"
+color="#ff1744" opacity="0.06"></a-sphere>
+            </a-entity>
+
+            <!-- Informational signs -->
+            <a-entity position="-8 2 -5">
+                <a-text value="← Oxygen-poor blood\nfrom body"
+align="center" scale="1.2 1.2 1.2" color="#0066cc"></a-text>
+            </a-entity>
+
+            <a-entity position="-8 1 -5">
+                <a-text value="Oxygen-rich\nblood to body →"
+align="center" scale="1.2 1.2 1.2" color="#ff0000"></a-text>
+            </a-entity>
+
+            <a-entity position="0 -0.5 -10">
+                <a-text value="❤️ BEATING HEART - Watch the chambers
+pump!" align="center" scale="1.8 1.8 1.8" color="#ff6b9d"></a-text>
+            </a-entity>
+        </a-scene>
+    </div>
+    <script>
+        let soundEnabled = true;
+        let audioContext;
+
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext ||
+window.webkitAudioContext)();
+            }
+        }
+
+        function playHeartbeat() {
+            if (!soundEnabled || !audioContext) return;
+            initAudio();
+
+            const now = audioContext.currentTime;
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+
+            osc.connect(gain);
+            gain.connect(audioContext.destination);
+
+            // First beat (thump)
+            osc.frequency.setValueAtTime(120, now);
+            gain.gain.setValueAtTime(0.3, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+            osc.start(now);
+            osc.stop(now + 0.1);
+
+            // Second beat (thump) - after delay
+            const osc2 = audioContext.createOscillator();
+            const gain2 = audioContext.createGain();
+            osc2.connect(gain2);
+            gain2.connect(audioContext.destination);
+            osc2.frequency.setValueAtTime(100, now + 0.15);
+            gain2.gain.setValueAtTime(0.2, now + 0.15);
+            gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.23);
+            osc2.start(now + 0.15);
+            osc2.stop(now + 0.23);
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const btn = document.getElementById('soundToggle');
+            btn.textContent = soundEnabled ? '🔊 Sound ON' : '🔇 Sound OFF';
+            btn.style.background = soundEnabled ? 'rgba(100, 200, 255,
+0.3)' : 'rgba(255, 100, 100, 0.3)';
+        }
+
+        function showInfo() {
+            document.getElementById('overlay').classList.add('show');
+        }
+
+        function closeInfo() {
+            document.getElementById('overlay').classList.remove('show');
+        }
+
+        function showVideo() {
+            document.getElementById('overlay').classList.remove('show');
+            document.getElementById('videoOverlay').classList.add('show');
+            const scene = document.getElementById('pumpScene');
+            if (scene) {
+                scene.play();
+                setTimeout(() => {
+                    startContinuousPump();
+                }, 300);
+            }
+        }
+
+        function closeVideo() {
+            document.getElementById('videoOverlay').classList.remove('show');
+            const scene = document.getElementById('pumpScene');
+            if (scene) scene.pause();
+            document.getElementById('overlay').classList.add('show');
+        }
+
+        function startContinuousPump() {
+            const heartPump = document.getElementById('heartPump');
+            if (heartPump) {
+                let pumpCount = 0;
+                const maxPumps = 1000; // Max safety
+
+                const pumpInterval = setInterval(() => {
+                    if
+(!document.getElementById('videoOverlay').classList.contains('show')
+|| pumpCount >= maxPumps) {
+                        clearInterval(pumpInterval);
+                        return;
+                    }
+                    heartPump.emit('continuePump');
+                    playHeartbeat();
+                    pumpCount++;
+                }, 900);
+            }
+        }
+
+        function doPump() {
+            const heart = document.getElementById('heart');
+            // Double pump animation
+            heart.emit('pump');
+            playHeartbeat();
+            setTimeout(() => {
+                heart.emit('pump');
+                playHeartbeat();
+            }, 700);
+            // Optional: triple pump for sustained effect
+            setTimeout(() => {
+                heart.emit('pump');
+                playHeartbeat();
+            }, 1400);
+        }
+
+        // Initialize audio on first interaction
+        document.addEventListener('click', () => {
+            if (!audioContext) initAudio();
+        }, { once: true });
+    </script>
 </body>
 </html>
