@@ -109,32 +109,6 @@
         this.el.object3D.position.y = this.startY + Math.sin(this.time * this.data.speed) * this.data.amplitude;
       }
     });
-
-    // --- Controller click helper for Meta Quest 3s ---
-    AFRAME.registerComponent('controller-listener', {
-      init: function () {
-        const el = this.el;
-        el.addEventListener('triggerdown', () => {
-          const intersections = el.components.raycaster.intersections;
-          if (intersections.length > 0) {
-            const clickedEl = intersections[0].object.el;
-            clickedEl.emit('click');
-          }
-        });
-      }
-    });
-
-    // --- Panel buttons support for VR controllers ---
-    AFRAME.registerComponent('panel-button', {
-      schema: { action: { type: 'string' } },
-      init: function () {
-        this.el.addEventListener('click', () => {
-          if (this.data.action === 'prev') prevPage();
-          if (this.data.action === 'next') nextPage();
-          if (this.data.action === 'close') closePanel();
-        });
-      }
-    });
   </script>
 </head>
 
@@ -148,20 +122,19 @@
       <img id="landscape" src="https://raw.githubusercontent.com/alluringxstalwart/SourceYISL/main/Landscape.png">
     </a-assets>
 
-    <!-- Camera + Controls -->
+    <!-- Camera + Rig -->
     <a-entity id="rig">
       <a-entity camera position="0 1.6 0" look-controls wasd-controls>
         <a-cursor color="#FFFFFF" fuse="false" raycaster="objects: .clickable; far: 20"></a-cursor>
       </a-entity>
 
-      <!-- Left Controller -->
+      <!-- LEFT and RIGHT Controllers (external code integration) -->
       <a-entity id="leftController" meta-touch-controls="hand: left" laser-controls="hand: left"
-                raycaster="objects: .clickable; far: 20" line="color: cyan" controller-listener>
+                raycaster="objects: .clickable; far: 20" line="color: cyan">
       </a-entity>
 
-      <!-- Right Controller -->
       <a-entity id="rightController" meta-touch-controls="hand: right" laser-controls="hand: right"
-                raycaster="objects: .clickable; far: 20" line="color: magenta" controller-listener>
+                raycaster="objects: .clickable; far: 20" line="color: magenta">
       </a-entity>
     </a-entity>
 
@@ -191,4 +164,16 @@
 
     <a-sphere class="clickable" position="4 1.5 -4" radius="0.5" color="#FFD700"
               click-learn="concept: quiz" floaty>
-      <a-text value="Quiz" align="center" color="black" width="1.5" position="0 0.
+      <a-text value="Quiz" align="center" color="black" width="1.5" position="0 0.8 0"></a-text>
+    </a-sphere>
+
+    <!-- 3D Background Image -->
+    <a-image src="#landscape" position="0 5 -10" width="25" height="7.5"></a-image>
+    <a-text value="Young Innovators STEM Lab" position="0 9.5 -10" align="center" color="white" font="mozillavr"
+      width="10" height="5"></a-text>
+
+    <!-- Content Panel -->
+    <a-plane id="contentPanel" position="0 1.6 -3" width="6" height="3" color="#222" visible="false">
+      <a-text value="" align="center" color="white" width="5" position="0 0.7 0"></a-text>
+      <a-box position="-1 -0.9 0.01" width="1" height="0.4" depth="0.05" color="yellow" class="clickable"
+             onclick="prevPage
