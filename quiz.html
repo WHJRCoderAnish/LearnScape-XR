@@ -7,15 +7,11 @@
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; overflow: hidden;
-background: #000; }
+        body { font-family: Arial, sans-serif; overflow: hidden; background: #000; }
         a-scene { width: 100%; height: 100vh; }
 
-        .header { position: fixed; top: 0; left: 0; right: 0; display:
-flex; justify-content: space-between; align-items: center; padding:
-20px; z-index: 50; }
-        .header h1 { color: white; font-size: 32px; flex: 1;
-text-align: center; }
+        .header { position: fixed; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; padding: 20px; z-index: 50; }
+        .header h1 { color: white; font-size: 32px; flex: 1; text-align: center; }
 
         .back-btn {
             padding: 10px 20px;
@@ -74,8 +70,7 @@ text-align: center; }
         }
 
         .panel h2 { font-size: 32px; margin-bottom: 20px; color: #4a90e2; }
-        .panel p { font-size: 18px; line-height: 1.8; margin-bottom:
-25px; color: #e0e0e0; }
+        .panel p { font-size: 18px; line-height: 1.8; margin-bottom: 25px; color: #e0e0e0; }
 
         .quiz-options {
             display: flex;
@@ -123,21 +118,9 @@ text-align: center; }
             display: none;
         }
 
-        .feedback.show {
-            display: block;
-        }
-
-        .feedback.correct {
-            background: rgba(76, 175, 80, 0.2);
-            color: #4caf50;
-            border: 2px solid #4caf50;
-        }
-
-        .feedback.incorrect {
-            background: rgba(244, 67, 54, 0.2);
-            color: #ff6b6b;
-            border: 2px solid #f44336;
-        }
+        .feedback.show { display: block; }
+        .feedback.correct { background: rgba(76, 175, 80, 0.2); color: #4caf50; border: 2px solid #4caf50; }
+        .feedback.incorrect { background: rgba(244, 67, 54, 0.2); color: #ff6b6b; border: 2px solid #f44336; }
 
         .close-btn {
             padding: 12px 24px;
@@ -172,38 +155,41 @@ text-align: center; }
 </head>
 <body>
     <div class="header">
-        <button class="back-btn"
-onclick="window.location.href='index.html';">← Back to Hub</button>
+        <button class="back-btn" onclick="window.location.href='index.html';">← Back to Hub</button>
         <h1>❓ QUIZ WORLD</h1>
         <div style="width: 100px;"></div>
     </div>
 
     <a-scene background="color: #fff9c4">
-        <a-camera position="0 1.6 0" look-controls wasd-controls></a-camera>
-        <a-light type="ambient" intensity="0.7"></a-light>
-        <a-light type="directional" intensity="0.8" position="10 15
-10"></a-light>
+        <!-- Camera rig with VR controllers -->
+        <a-entity id="cameraRig" position="0 1.6 0">
+            <a-camera look-controls wasd-controls></a-camera>
 
-        <a-plane position="0 0 0" rotation="-90 0 0" width="50"
-height="50" color="#ffeb3b"></a-plane>
+            <!-- Left & Right hand controllers with raycaster -->
+            <a-entity id="leftHand" hand-controls="hand: left; handModelStyle: box" 
+                      raycaster="objects: .quiz-option" line="color: cyan"></a-entity>
+            <a-entity id="rightHand" hand-controls="hand: right; handModelStyle: box" 
+                      raycaster="objects: .quiz-option" line="color: cyan"></a-entity>
+        </a-entity>
+
+        <a-light type="ambient" intensity="0.7"></a-light>
+        <a-light type="directional" intensity="0.8" position="10 15 10"></a-light>
+
+        <a-plane position="0 0 0" rotation="-90 0 0" width="50" height="50" color="#ffeb3b"></a-plane>
 
         <!-- Quiz Cube -->
-        <a-entity position="0 2 -8" animation="property: rotation; to:
-360 360 360; dur: 3000; loop: true">
+        <a-entity position="0 2 -8" animation="property: rotation; to: 360 360 360; dur: 3000; loop: true">
             <a-box width="1" height="1" depth="1" color="#9c27b0"></a-box>
-            <a-text value="?" position="0 0 0.51" scale="1.2 1.2 1.2"
-color="white" align="center"></a-text>
+            <a-text value="?" position="0 0 0.51" scale="1.2 1.2 1.2" color="white" align="center"></a-text>
         </a-entity>
 
         <a-entity position="0 -1 -4">
-            <a-text value="Click the button below" align="center"
-scale="1.5 1.5 1.5" color="white"></a-text>
+            <a-text value="Point and pull trigger to answer" align="center" scale="1.5 1.5 1.5" color="white"></a-text>
         </a-entity>
     </a-scene>
 
     <button class="main-btn" onclick="startQuiz();">❓ Take Quiz</button>
-    <button class="sound-toggle" id="soundToggle"
-onclick="toggleSound()">🔊 Sound ON</button>
+    <button class="sound-toggle" id="soundToggle" onclick="toggleSound()">🔊 Sound ON</button>
 
     <div class="overlay" id="overlay">
         <div class="panel">
@@ -211,8 +197,7 @@ onclick="toggleSound()">🔊 Sound ON</button>
             <p id="question"></p>
             <div class="quiz-options" id="options"></div>
             <div id="feedback" class="feedback"></div>
-            <button class="close-btn" onclick="closeQuiz();"
-id="closeBtn">Close Quiz</button>
+            <button class="close-btn" onclick="closeQuiz();" id="closeBtn">Close Quiz</button>
         </div>
     </div>
 
@@ -221,59 +206,38 @@ id="closeBtn">Close Quiz</button>
         let audioContext;
 
         function initAudio() {
-            if (!audioContext) {
-                audioContext = new (window.AudioContext ||
-window.webkitAudioContext)();
-            }
+            if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
         }
 
         function playCorrectSound() {
             if (!soundEnabled || !audioContext) return;
             initAudio();
-
             const now = audioContext.currentTime;
-
-            // Two ascending tones for correct answer
-            const freqs = [400, 600];
-
-            freqs.forEach((freq, index) => {
+            [400, 600].forEach((freq, i) => {
                 const osc = audioContext.createOscillator();
                 const gain = audioContext.createGain();
-
-                osc.connect(gain);
-                gain.connect(audioContext.destination);
-
-                const startTime = now + (index * 0.1);
+                osc.connect(gain); gain.connect(audioContext.destination);
+                const startTime = now + i*0.1;
                 osc.frequency.setValueAtTime(freq, startTime);
                 gain.gain.setValueAtTime(0.2, startTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.15);
-                osc.start(startTime);
-                osc.stop(startTime + 0.15);
+                gain.gain.exponentialRampToValueAtTime(0.01, startTime+0.15);
+                osc.start(startTime); osc.stop(startTime+0.15);
             });
         }
 
         function playIncorrectSound() {
             if (!soundEnabled || !audioContext) return;
             initAudio();
-
             const now = audioContext.currentTime;
-
-            // Two descending tones for incorrect answer
-            const freqs = [500, 300];
-
-            freqs.forEach((freq, index) => {
+            [500, 300].forEach((freq, i) => {
                 const osc = audioContext.createOscillator();
                 const gain = audioContext.createGain();
-
-                osc.connect(gain);
-                gain.connect(audioContext.destination);
-
-                const startTime = now + (index * 0.1);
+                osc.connect(gain); gain.connect(audioContext.destination);
+                const startTime = now + i*0.1;
                 osc.frequency.setValueAtTime(freq, startTime);
                 gain.gain.setValueAtTime(0.2, startTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.15);
-                osc.start(startTime);
-                osc.stop(startTime + 0.15);
+                gain.gain.exponentialRampToValueAtTime(0.01, startTime+0.15);
+                osc.start(startTime); osc.stop(startTime+0.15);
             });
         }
 
@@ -281,33 +245,27 @@ window.webkitAudioContext)();
             soundEnabled = !soundEnabled;
             const btn = document.getElementById('soundToggle');
             btn.textContent = soundEnabled ? '🔊 Sound ON' : '🔇 Sound OFF';
-            btn.style.background = soundEnabled ? 'rgba(100, 200, 255,
-0.3)' : 'rgba(255, 100, 100, 0.3)';
+            btn.style.background = soundEnabled ? 'rgba(100, 200, 255,0.3)' : 'rgba(255, 100, 100,0.3)';
         }
 
         const quizzes = [
-            {
-                question: "What is the primary function of the heart?",
-                options: [
-                    { text: "A) Filter waste from blood", correct: false },
-                    { text: "B) Pump blood throughout the body",
-correct: true },
-                    { text: "C) Produce oxygen", correct: false },
-                    { text: "D) Store nutrients", correct: false }
-                ],
-                explanation: "Correct! The heart pumps oxygen-rich
-blood throughout the body."
+            { question: "What is the primary function of the heart?",
+              options: [
+                  { text: "A) Filter waste from blood", correct: false },
+                  { text: "B) Pump blood throughout the body", correct: true },
+                  { text: "C) Produce oxygen", correct: false },
+                  { text: "D) Store nutrients", correct: false }
+              ],
+              explanation: "Correct! The heart pumps oxygen-rich blood throughout the body."
             },
-            {
-                question: "What orbits the nucleus in an atom?",
-                options: [
-                    { text: "A) Protons", correct: false },
-                    { text: "B) Neutrons", correct: false },
-                    { text: "C) Electrons", correct: true },
-                    { text: "D) Ions", correct: false }
-                ],
-                explanation: "Correct! Electrons orbit around the
-nucleus in orbitals."
+            { question: "What orbits the nucleus in an atom?",
+              options: [
+                  { text: "A) Protons", correct: false },
+                  { text: "B) Neutrons", correct: false },
+                  { text: "C) Electrons", correct: true },
+                  { text: "D) Ions", correct: false }
+              ],
+              explanation: "Correct! Electrons orbit around the nucleus in orbitals."
             }
         ];
 
@@ -315,8 +273,7 @@ nucleus in orbitals."
         let answered = false;
 
         function startQuiz() {
-            currentQuizIndex = 0;
-            answered = false;
+            currentQuizIndex = 0; answered = false;
             showQuestion();
             document.getElementById('overlay').classList.add('show');
         }
@@ -325,18 +282,15 @@ nucleus in orbitals."
             answered = false;
             const quiz = quizzes[currentQuizIndex];
             document.getElementById('question').textContent = quiz.question;
-
             const optionsDiv = document.getElementById('options');
             optionsDiv.innerHTML = '';
-
-            quiz.options.forEach((option, index) => {
+            quiz.options.forEach((option, i) => {
                 const btn = document.createElement('div');
                 btn.className = 'quiz-option';
                 btn.textContent = option.text;
-                btn.onclick = () => checkAnswer(index);
+                btn.onclick = () => checkAnswer(i);
                 optionsDiv.appendChild(btn);
             });
-
             document.getElementById('feedback').className = 'feedback';
             document.getElementById('feedback').textContent = '';
             document.getElementById('closeBtn').textContent = 'Close Quiz';
@@ -345,13 +299,10 @@ nucleus in orbitals."
         function checkAnswer(index) {
             if (answered) return;
             answered = true;
-
             const quiz = quizzes[currentQuizIndex];
             const options = document.querySelectorAll('.quiz-option');
             const feedback = document.getElementById('feedback');
-
             options.forEach(opt => opt.style.pointerEvents = 'none');
-
             if (quiz.options[index].correct) {
                 options[index].classList.add('correct');
                 feedback.textContent = '✓ ' + quiz.explanation;
@@ -361,19 +312,14 @@ nucleus in orbitals."
                 options[index].classList.add('incorrect');
                 const correctIndex = quiz.options.findIndex(o => o.correct);
                 options[correctIndex].classList.add('correct');
-                feedback.textContent = '✗ Incorrect. Correct: ' +
-quiz.options[correctIndex].text;
+                feedback.textContent = '✗ Incorrect. Correct: ' + quiz.options[correctIndex].text;
                 feedback.className = 'feedback show incorrect';
                 playIncorrectSound();
             }
-
             const btn = document.getElementById('closeBtn');
             if (currentQuizIndex < quizzes.length - 1) {
                 btn.textContent = 'Next Question →';
-                btn.onclick = () => {
-                    currentQuizIndex++;
-                    showQuestion();
-                };
+                btn.onclick = () => { currentQuizIndex++; showQuestion(); };
             } else {
                 btn.textContent = 'Quiz Complete!';
                 btn.onclick = () => closeQuiz();
@@ -384,10 +330,21 @@ quiz.options[correctIndex].text;
             document.getElementById('overlay').classList.remove('show');
         }
 
+        // VR Controller Integration
+        function setupController(controllerEl) {
+            controllerEl.addEventListener('triggerdown', evt => {
+                const intersectedEl = evt.detail.intersectedEl;
+                if (intersectedEl && intersectedEl.classList.contains('quiz-option')) {
+                    intersectedEl.click();
+                }
+            });
+        }
+
+        setupController(document.querySelector('#leftHand'));
+        setupController(document.querySelector('#rightHand'));
+
         // Initialize audio on first interaction
-        document.addEventListener('click', () => {
-            if (!audioContext) initAudio();
-        }, { once: true });
+        document.addEventListener('click', () => { if (!audioContext) initAudio(); }, { once: true });
     </script>
 </body>
 </html>
