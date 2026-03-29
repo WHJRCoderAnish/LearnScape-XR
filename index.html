@@ -23,14 +23,14 @@
         <a-entity laser-controls="hand: left"
                   raycaster="objects: .clickable; far: 20"
                   line="color: cyan"
-                  raycast-click>
+                  controller-click>
         </a-entity>
 
         <!-- Right Controller -->
         <a-entity laser-controls="hand: right"
                   raycaster="objects: .clickable; far: 20"
                   line="color: magenta"
-                  raycast-click>
+                  controller-click>
         </a-entity>
       </a-entity>
 
@@ -41,16 +41,14 @@
       <!-- Sky -->
       <a-sky src="#city-sky"></a-sky>
 
-      <!-- Concept Spheres -->
+      <!-- Concept & Quiz Spheres -->
       <a-sphere class="clickable" id="concept1" position="-3 1.25 -5" radius="1.25" color="#EF2D5E"></a-sphere>
       <a-sphere class="clickable" id="concept2" position="-1 1.25 -5" radius="1.25" color="#4CC3D9"></a-sphere>
       <a-sphere class="clickable" id="concept3" position="1 1.25 -5" radius="1.25" color="#FFC65D"></a-sphere>
-
-      <!-- Quiz Sphere -->
       <a-sphere class="clickable" id="quiz" position="3 1.25 -5" radius="1.25" color="#8A2BE2"></a-sphere>
       <a-text value="Quiz" position="3 3 -5" align="center" color="white" width="3"></a-text>
 
-      <!-- Panels -->
+      <!-- Panel for Concept/Quiz Content -->
       <a-entity id="panel" visible="false">
         <a-plane id="panelBG" color="#222" width="4" height="3" position="0 1.6 -2"></a-plane>
         <a-text id="panelTitle" value="" color="#FFF" position="-1.8 2 -2" width="3"></a-text>
@@ -63,13 +61,15 @@
         </a-box>
       </a-entity>
 
-      <!-- Score Text -->
+      <!-- Score -->
       <a-text id="scoreText" value="" position="0 4 -2" color="yellow" align="center" width="6"></a-text>
 
       <!-- Scripts -->
       <script>
-        // Raycast trigger support for controllers
-        AFRAME.registerComponent('raycast-click', {
+        // ---------------------------
+        // Controller trigger click component
+        // ---------------------------
+        AFRAME.registerComponent('controller-click', {
           init: function () {
             this.el.addEventListener('triggerdown', () => {
               const raycaster = this.el.components.raycaster;
@@ -83,7 +83,9 @@
           }
         });
 
-        // Concept pages
+        // ---------------------------
+        // Concept Pages
+        // ---------------------------
         const concepts = {
           concept1: [
             "Concept 1: Motion Basics - Page 1",
@@ -133,9 +135,9 @@
           panel.setAttribute('visible', true);
         };
 
-        const hidePanel = () => panel.setAttribute('visible', false);
-
-        // Concept click
+        // ---------------------------
+        // Sphere click logic
+        // ---------------------------
         document.querySelectorAll('.clickable').forEach(el => {
           el.addEventListener('click', () => {
             if (el.id.startsWith("concept")) {
@@ -150,7 +152,9 @@
           });
         });
 
+        // ---------------------------
         // Next & Prev buttons
+        // ---------------------------
         document.querySelector('#nextBtn').addEventListener('click', () => {
           if (currentConcept === "quiz") {
             quizIndex++;
@@ -180,8 +184,8 @@
             }
           }
         });
-      </script>
 
+      </script>
     </a-scene>
   </body>
 </html>
