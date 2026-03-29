@@ -7,12 +7,10 @@
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; overflow: hidden;
-background: #000; }
+        body { font-family: Arial, sans-serif; overflow: hidden; background: #000; }
         a-scene { width: 100%; height: 100vh; }
 
-        .header { position: fixed; top: 0; left: 0; right: 0;
-text-align: center; color: white; padding: 20px; z-index: 10; }
+        .header { position: fixed; top: 0; left: 0; right: 0; text-align: center; color: white; padding: 20px; z-index: 10; }
         .header h1 { font-size: 48px; margin: 0; }
 
         .buttons-container {
@@ -35,40 +33,20 @@ text-align: center; color: white; padding: 20px; z-index: 10; }
             transition: all 0.3s ease;
             color: white;
             min-width: 150px;
+            box-shadow: 0 0 20px rgba(100, 100, 200, 0.5);
+            animation: floatIn 0.6s ease-out;
         }
 
-        .btn-heart {
-            background: #ff6b9d;
-        }
+        .btn-heart { background: #ff6b9d; }
+        .btn-heart:hover { background: #e91e63; transform: scale(1.05); }
 
-        .btn-heart:hover {
-            background: #e91e63;
-            transform: scale(1.05);
-        }
+        .btn-atom { background: #ffd700; color: #333; }
+        .btn-atom:hover { background: #ffb300; transform: scale(1.05); }
 
-        .btn-atom {
-            background: #ffd700;
-            color: #333;
-        }
+        .btn-quiz { background: #4a90e2; }
+        .btn-quiz:hover { background: #2979f0; transform: scale(1.05); }
 
-        .btn-atom:hover {
-            background: #ffb300;
-            transform: scale(1.05);
-        }
-
-        .btn-quiz {
-            background: #4a90e2;
-        }
-
-        .btn-quiz:hover {
-            background: #2979f0;
-            transform: scale(1.05);
-        }
-
-        .btn:active {
-            transform: scale(0.95);
-            box-shadow: 0 0 10px rgba(100, 100, 200, 0.3);
-        }
+        .btn:active { transform: scale(0.95); box-shadow: 0 0 10px rgba(100, 100, 200, 0.3); }
 
         .info-text {
             position: fixed;
@@ -82,10 +60,8 @@ text-align: center; color: white; padding: 20px; z-index: 10; }
             animation: pulse 2s infinite;
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 0.7; }
-            50% { opacity: 1; }
-        }
+        @keyframes pulse { 0%, 100% { opacity: 0.7; } 50% { opacity: 1; } }
+        @keyframes floatIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         .sound-toggle {
             position: fixed;
@@ -101,27 +77,7 @@ text-align: center; color: white; padding: 20px; z-index: 10; }
             z-index: 50;
             transition: all 0.3s ease;
         }
-
-        .sound-toggle:hover {
-            background: rgba(100, 200, 255, 0.5);
-            transform: scale(1.05);
-        }
-
-        .btn {
-            box-shadow: 0 0 20px rgba(100, 100, 200, 0.5);
-            animation: floatIn 0.6s ease-out;
-        }
-
-        @keyframes floatIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+        .sound-toggle:hover { background: rgba(100, 200, 255, 0.5); transform: scale(1.05); }
     </style>
 </head>
 <body>
@@ -130,47 +86,56 @@ text-align: center; color: white; padding: 20px; z-index: 10; }
     </div>
 
     <a-scene background="color: #0f3460">
-        <a-camera position="0 1.6 0" look-controls wasd-controls></a-camera>
+        <!-- Camera + Rig -->
+        <a-entity id="rig">
+            <a-entity camera position="0 1.6 0" look-controls wasd-controls>
+                <a-cursor color="#FFFFFF" fuse="false" raycaster="objects: .clickable; far: 20"></a-cursor>
+            </a-entity>
+
+            <!-- Left Controller -->
+            <a-entity id="leftController" meta-touch-controls="hand: left" laser-controls="hand: left"
+                      raycaster="objects: .clickable; far: 20" line="color: cyan" controller-listener>
+            </a-entity>
+
+            <!-- Right Controller -->
+            <a-entity id="rightController" meta-touch-controls="hand: right" laser-controls="hand: right"
+                      raycaster="objects: .clickable; far: 20" line="color: magenta" controller-listener>
+            </a-entity>
+        </a-entity>
+
+        <!-- Lights -->
         <a-light type="ambient" intensity="0.7"></a-light>
-        <a-light type="directional" intensity="0.8" position="10 15
-10"></a-light>
+        <a-light type="directional" intensity="0.8" position="10 15 10"></a-light>
 
-        <a-plane position="0 0 0" rotation="-90 0 0" width="50"
-height="50" color="#2a2a4a"></a-plane>
+        <!-- Ground -->
+        <a-plane position="0 0 0" rotation="-90 0 0" width="50" height="50" color="#2a2a4a"></a-plane>
 
-        <!-- Heart Display -->
-        <a-entity position="-5 2 -8">
+        <!-- Spheres / Displays (clickable) -->
+        <a-entity class="clickable" position="-5 2 -8" onclick="navigateTo('heart.html');">
             <a-sphere radius="1.2" color="#ff6b9d"></a-sphere>
         </a-entity>
 
-        <!-- Atom Display -->
-        <a-entity position="0 2 -8">
+        <a-entity class="clickable" position="0 2 -8" onclick="navigateTo('atom.html');">
             <a-sphere radius="1.2" color="#ffd700"></a-sphere>
         </a-entity>
 
-        <!-- Quiz Display -->
-        <a-entity position="5 2 -8">
+        <a-entity class="clickable" position="5 2 -8" onclick="navigateTo('quiz.html');">
             <a-sphere radius="1.2" color="#4a90e2"></a-sphere>
         </a-entity>
 
         <a-entity position="0 5.5 -12">
-            <a-text value="Interactive Learning Hub" align="center"
-scale="2 2 2" color="#667eea"></a-text>
+            <a-text value="Interactive Learning Hub" align="center" scale="2 2 2" color="#667eea"></a-text>
         </a-entity>
     </a-scene>
 
-    <button class="sound-toggle" id="soundToggle"
-onclick="toggleSound()">🔊 Sound ON</button>
+    <button class="sound-toggle" id="soundToggle" onclick="toggleSound()">🔊 Sound ON</button>
 
-    <div class="info-text">👆 Click a button below to explore</div>
+    <div class="info-text">👆 Click a button below or use VR controllers</div>
 
     <div class="buttons-container">
-        <button class="btn btn-heart"
-onclick="navigateTo('heart.html');">❤️ Heart</button>
-        <button class="btn btn-atom"
-onclick="navigateTo('atom.html');">⚛️ Atom</button>
-        <button class="btn btn-quiz"
-onclick="navigateTo('quiz.html');">❓ Quiz</button>
+        <button class="btn btn-heart" onclick="navigateTo('heart.html');">❤️ Heart</button>
+        <button class="btn btn-atom" onclick="navigateTo('atom.html');">⚛️ Atom</button>
+        <button class="btn btn-quiz" onclick="navigateTo('quiz.html');">❓ Quiz</button>
     </div>
 
     <script>
@@ -178,23 +143,17 @@ onclick="navigateTo('quiz.html');">❓ Quiz</button>
         let audioContext;
 
         function initAudio() {
-            if (!audioContext) {
-                audioContext = new (window.AudioContext ||
-window.webkitAudioContext)();
-            }
+            if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
         }
 
         function playClickSound() {
             if (!soundEnabled || !audioContext) return;
             initAudio();
-
             const now = audioContext.currentTime;
             const osc = audioContext.createOscillator();
             const gain = audioContext.createGain();
-
             osc.connect(gain);
             gain.connect(audioContext.destination);
-
             osc.frequency.setValueAtTime(400, now);
             gain.gain.setValueAtTime(0.2, now);
             gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
@@ -206,21 +165,31 @@ window.webkitAudioContext)();
             soundEnabled = !soundEnabled;
             const btn = document.getElementById('soundToggle');
             btn.textContent = soundEnabled ? '🔊 Sound ON' : '🔇 Sound OFF';
-            btn.style.background = soundEnabled ? 'rgba(100, 200, 255,
-0.3)' : 'rgba(255, 100, 100, 0.3)';
+            btn.style.background = soundEnabled ? 'rgba(100, 200, 255, 0.3)' : 'rgba(255, 100, 100, 0.3)';
         }
 
         function navigateTo(page) {
             playClickSound();
-            setTimeout(() => {
-                window.location.href = page;
-            }, 50);
+            setTimeout(() => { window.location.href = page; }, 50);
         }
 
-        // Initialize audio on first interaction
-        document.addEventListener('click', () => {
-            if (!audioContext) initAudio();
-        }, { once: true });
+        document.addEventListener('click', () => { if (!audioContext) initAudio(); }, { once: true });
+
+        // --- Controller Click Support ---
+        AFRAME.registerComponent('controller-listener', {
+            init: function () {
+                const el = this.el;
+                el.addEventListener('triggerdown', () => {
+                    const intersections = el.components.raycaster.intersections;
+                    if (intersections.length > 0) {
+                        const clickedEl = intersections[0].object.el;
+                        if (clickedEl && clickedEl.classList.contains('clickable')) {
+                            clickedEl.emit('click');
+                        }
+                    }
+                });
+            }
+        });
     </script>
 </body>
 </html>
